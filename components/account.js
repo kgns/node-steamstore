@@ -43,6 +43,63 @@ SteamStore.prototype.addPhoneNumber = function(number, bypassConfirmation, callb
 			let error;
 
 			if (body.success) {
+				if (body.state != "email_verification") {
+					error = new Error("Unknown state " + body.state);
+					error.confirmation = false;
+
+					return reject(error);
+				}
+
+				return accept();
+			}
+
+			if (body.errorText) {
+				error = new Error(body.errorText);
+				error.confirmation = false;
+				return reject(error);
+			}
+
+			if (body.requiresConfirmation) {
+				error = new Error(body.confirmationText);
+				error.confirmation = true;
+				return reject(error);
+			}
+
+			error = new Error("Malformed response");
+			error.confirmation = false;
+			return reject(error);
+		});
+	});
+};
+
+/**
+ * send sms code after confirm change on email
+ * @param {function} [callback]
+ * @returns {Promise}
+ */
+SteamStore.prototype.sendPhoneCode = function(callback) {
+	return StdLib.Promises.callbackPromise(null, callback, (accept, reject) => {
+
+		this.request.post({
+			"uri": "https://store.steampowered.com/phone/add_ajaxop",
+			"form": {
+				"op": "email_verification",
+				"input": "",
+				"sessionID": this.getSessionID(),
+				"confirmed": 1,
+				"checkfortos": 1,
+				"bisediting": 0,
+				"token": 0
+			},
+			"json": true
+		}, (err, response, body) => {
+			if (this._checkHttpError(err, response, reject)) {
+				return;
+			}
+
+			let error;
+
+			if (body.success) {
 				if (body.state != "get_sms_code") {
 					error = new Error("Unknown state " + body.state);
 					error.confirmation = false;
