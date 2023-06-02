@@ -207,6 +207,10 @@ SteamStore.prototype.verifyPhoneNumber = function(code, callback) {
 				return reject(new Error(body.errorText));
 			}
 
+			if (body.active_locks || body.phone_tos_violation) {
+				return reject(new Error("This number is in use on an account that is currently locked."));
+			}
+
 			return reject(new Error("Malformed response"));
 		});
 	});
