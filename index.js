@@ -37,14 +37,19 @@ function SteamStore(options) {
  * @param {string} cookie - In format "cookieName=cookieValue"
  */
 SteamStore.prototype.setCookie = function(cookie) {
-	let cookieName = cookie.match(/(.+)=/)[1];
+	let cookieName = cookie.trim().split('=')[0];
 	if (cookieName == 'steamLogin' || cookieName == 'steamLoginSecure') {
-		this.steamID = new SteamID(cookie.match(/=(\d+)/)[1]);
+		this.steamID = new SteamID(cookie.match(/steamLogin(Secure)?=(\d+)/)[2]);
 	}
 
 	let isSecure = !!cookieName.match(/(^steamMachineAuth|^steamLoginSecure$)/);
-	this._jar.setCookie(Request.cookie(cookie), (isSecure ? "https://" : "http://") + "store.steampowered.com");
-	this._jar.setCookie(Request.cookie(cookie), (isSecure ? "https://" : "http://") + "steamcommunity.com");
+
+	if (cookie.domain) {
+		this._jar.setCookie(Request.cookie(cookie), (isSecure ? "https://" : "http://") + cookie.domain);
+	} else {
+		this._jar.setCookie(Request.cookie(cookie), (isSecure ? "https://" : "http://") + "store.steampowered.com");
+		this._jar.setCookie(Request.cookie(cookie), (isSecure ? "https://" : "http://") + "steamcommunity.com");
+	}
 };
 
 /**
