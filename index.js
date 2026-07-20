@@ -42,14 +42,17 @@ SteamStore.prototype.setCookie = function(cookie) {
 		this.steamID = new SteamID(cookie.match(/steamLogin(Secure)?=(\d+)/)[2]);
 	}
 
+	let requestCookie = Request.cookie(cookie);
+
 	let isSecure = !!cookieName.match(/(^steamMachineAuth|^steamLoginSecure$)/);
 
-	cookie = Request.cookie(cookie);
-	if (cookie.domain) {
-		this._jar.setCookie(cookie.clone(), (isSecure ? "https://" : "http://") + cookie.domain);
+	let protocol = isSecure ? 'https' : 'http';
+
+	if (requestCookie.domain) {
+		this._jar.setCookie(requestCookie.clone(), protocol + '://' + requestCookie.domain);
 	} else {
-		this._jar.setCookie(cookie.clone(), (isSecure ? "https://" : "http://") + "store.steampowered.com");
-		this._jar.setCookie(cookie.clone(), (isSecure ? "https://" : "http://") + "steamcommunity.com");
+		this._jar.setCookie(Request.cookie(cookie), protocol + "://store.steampowered.com");
+		this._jar.setCookie(Request.cookie(cookie), protocol + "://steamcommunity.com");
 	}
 };
 

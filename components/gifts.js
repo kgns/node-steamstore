@@ -27,9 +27,9 @@ SteamStore.prototype.sendGift = function(giftID, recipient, recipientName, messa
 		}
 
 		this.request.post({
-			"uri": "https://store.steampowered.com/checkout/sendgiftsubmit/",
+			"uri": "https://checkout.steampowered.com/checkout/sendgiftsubmit/",
 			"headers": {
-				"Referer": "https://store.steampowered.com/checkout/sendgift/" + giftID
+				"Referer": "https://checkout.steampowered.com/checkout/sendgift/" + giftID
 			},
 			"form": {
 				"GifteeAccountID": accountid,

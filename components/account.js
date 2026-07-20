@@ -435,7 +435,7 @@ SteamStore.prototype.createWallet = function(code, billingAddress, callback) {
 		'currencyCode'
 	], callback, (accept, reject) => {
 		this.request.post({
-			"uri": "https://store.steampowered.com/account/createwalletandcheckfunds/",
+			"uri": "https://store.steampowered.com/account/ajaxcreatewalletandcheckfunds/",
 			"form": {
 				"wallet_code": code,
 				"CreateFromAddress": "1",
@@ -459,7 +459,7 @@ SteamStore.prototype.createWallet = function(code, billingAddress, callback) {
 			accept({
 				"eresult": body.success,
 				"detail": body.detail,
-				"redeemable": body.success == EResult.OK && body.detail == EPurchaseResult.NoDetail,
+				"redeemable": body.success == EResult.OK && (body.detail || EPurchaseResult.NoDetail) == EPurchaseResult.NoDetail,
 				"amount": body.wallet && body.wallet.amount,
 				"currencyCode": body.wallet && body.wallet.currencycode
 			});
@@ -505,7 +505,7 @@ SteamStore.prototype.redeemWalletCode = function(code, callback) {
 				return;
 			}
 
-			if (!body.success && !body.detail) {
+			if (!body || (!body.success && !body.detail)) {
 				return reject(new Error('Malformed response'));
 			}
 

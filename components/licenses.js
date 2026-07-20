@@ -13,7 +13,7 @@ const SteamStore = require('../index.js');
 SteamStore.prototype.addFreeLicense = function(subID, callback) {
 	return StdLib.Promises.callbackPromise(null, callback, true, (resolve, reject) => {
 		this.request.post({
-			"uri": "https://store.steampowered.com/checkout/addfreelicense",
+			"uri": "https://store.steampowered.com/freelicense/addfreelicense",
 			"form": {
 				"action": "add_to_cart",
 				"sessionid": this.getSessionID(),
